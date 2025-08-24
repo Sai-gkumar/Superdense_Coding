@@ -1,0 +1,18 @@
+
+1. Backend:
+
+
+
+cd superdense-coding-demo/backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+
+
+2. Frontend:
+
+
+cd superdense-coding-demo/frontend
+npm install
+npm start
