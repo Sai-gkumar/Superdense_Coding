@@ -1,8 +1,7 @@
+To run this project on your local system you can use these command on command prompt("CMD")
+first you have to run the backend then only run the frontend for the better experience
 
 1. Backend:
-
-
-
 cd superdense-coding-demo/backend
 python -m venv venv
 venv\Scripts\activate
@@ -11,8 +10,6 @@ python app.py
 
 
 2. Frontend:
-
-
 cd superdense-coding-demo/frontend
 npm install
 npm start
