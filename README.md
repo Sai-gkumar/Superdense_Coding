@@ -1,0 +1,1 @@
+Simulate Superdense Coding lets you interactively see how two classical bits are transmitted using just one qubit and quantum entanglement. Alice encodes her bits with quantum gates, sends her qubit, and Bob decodes the original information via measurement, showcasing quantum communication efficiency
