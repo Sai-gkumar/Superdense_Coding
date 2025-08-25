@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superdense Coding Demo - Interactive Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .quantum-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .quantum-pulse {
+            animation: pulse 2s infinite;
+        }
+        .circuit-gate {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .circuit-gate:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        @keyframes highlight {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(102, 126, 234, 0.2); }
+        }
+        .highlight {
+            animation: highlight 1s ease-in-out;
+        }
+        .qubit-state {
+            transition: all 0.5s ease;
+        }
+        .state-visualization {
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .qubit-representation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .qubit-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .qubit-a {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .qubit-b {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+        .connection-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #00f2fe);
+            position: relative;
+        }
+        .connection-line::after {
+            content: '⚛️';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+        }
+        .encoding-visual {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .decoding-visual {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .gate-operation {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+            display: inline-block;
+        }
+        .gate-x { background: #4CAF50; color: white; }
+        .gate-z { background: #2196F3; color: white; }
+        .gate-h { background: #FF9800; color: white; }
+        .gate-cnot { background: #9C27B0; color: white; }
+        .process-step {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .matrix {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .state-transition {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .arrow {
+            font-size: 20px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="quantum-gradient text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="outline: rgb(0, 0, 0) dotted 3px; outline-offset: 1px;">Superdense Coding Demo</h1>
+            <p class="text-xl opacity-90">Transmitting 2 Classical Bits Using 1 Qubit Through Quantum Entanglement</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Introduction -->
+        <section class="mb-12 bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">What is Superdense Coding?</h2>
+            <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                Superdense coding is a quantum communication protocol that allows transmission of <strong>two classical bits</strong> using only <strong>one qubit</strong>, enabled by quantum entanglement. This demo simulates the complete process from entanglement creation to classical bit recovery.
+            </p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-purple-50 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold text-purple-700 mb-3">Key Steps:</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Create entangled Bell state pair</li>
+                        <li>Encode 2 classical bits into qubit state</li>
+                        <li>Transmit single qubit to receiver</li>
+                        <li>Perform Bell measurement</li>
+                        <li>Recover original classical bits</li>
+                    </ul>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold text-purple-700 mb-3">Learning Objectives:</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Understand quantum entanglement</li>
+                        <li>Learn quantum gate operations</li>
+                        <li>See quantum measurement in action</li>
+                        <li>Grasp quantum information theory</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Demo -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Interactive Simulation</h2>
+            
+            <!-- Control Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">Choose Classical Bits to Transmit</h3>
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <button onclick="startSimulation('00')" class="bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors quantum-pulse">00</button>
+                    <button onclick="startSimulation('01')" class="bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors">01</button>
+                    <button onclick="startSimulation('10')" class="bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors">10</button>
+                    <button onclick="startSimulation('11')" class="bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors">11</button>
+                </div>
+                
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Current Selection:</h4>
+                    <div id="current-selection" class="text-2xl font-mono bg-white p-4 rounded">--</div>
+                </div>
+            </div>
+
+            <!-- Detailed Encoding Visualization -->
+            <div id="encoding-details" class="bg-white rounded-lg shadow-lg p-6 mb-8" style="display: none;">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">📤 Encoding Process Details</h3>
+                
+                <div class="process-step">
+                    <div class="step-title">Initial State:</div>
+                    <div class="matrix">|Ψ⟩ = |00⟩</div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-title">Step 1: Create Bell State (Φ⁺):</div>
+                    <div class="state-transition">
+                        <span class="matrix">|00⟩</span>
+                        <span class="arrow">→</span>
+                        <span class="gate-operation gate-h">H⊗I</span>
+                        <span class="arrow">→</span>
+                        <span class="matrix">(|0⟩+|1⟩)|0⟩/√2</span>
+                        <span class="arrow">→</span>
+                        <span class="gate-operation gate-cnot">CNOT</span>
+                        <span class="arrow">→</span>
+                        <span class="matrix">(|00⟩+|11⟩)/√2 = Φ⁺</span>
+                    </div>
+                </div>
+
+                <div id="encoding-specific" class="process-step">
+                    <div class="step-title">Step 2: Apply Gates Based on Classical Bits:</div>
+                    <div id="gate-operations" class="state-transition">
+                        <span class="matrix">Φ⁺</span>
+                        <span class="arrow">→</span>
+                        <span id="applied-gates" class="gate-operation" style="background: #666;">No gates</span>
+                        <span class="arrow">→</span>
+                        <span id="final-encoded-state" class="matrix">Φ⁺</span>
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-title">Encoding Table:</div>
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-purple-600 text-white">
+                                    <th class="p-2">Bits</th>
+                                    <th class="p-2">Operation</th>
+                                    <th class="p-2">Final State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">00</td>
+                                    <td class="p-2">I (Identity)</td>
+                                    <td class="p-2 font-mono">Φ⁺ = (|00⟩+|11⟩)/√2</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">01</td>
+                                    <td class="p-2">X (NOT gate)</td>
+                                    <td class="p-2 font-mono">Ψ⁺ = (|01⟩+|10⟩)/√2</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">10</td>
+                                    <td class="p-2">Z (Phase flip)</td>
+                                    <td class="p-2 font-mono">Φ⁻ = (|00⟩-|11⟩)/√2</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">11</td>
+                                    <td class="p-2">Z·X (Both gates)</td>
+                                    <td class="p-2 font-mono">Ψ⁻ = (|01⟩-|10⟩)/√2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Encoding/Decoding Display -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">Visual Process Representation</h3>
+                
+                <div class="state-visualization">
+                    <h4 class="font-semibold text-gray-700 mb-3">Qubit States</h4>
+                    <div class="qubit-representation">
+                        <div class="qubit-circle qubit-a" id="qubit-a-state">|0⟩</div>
+                        <div class="connection-line"></div>
+                        <div class="qubit-circle qubit-b" id="qubit-b-state">|0⟩</div>
+                    </div>
+                    
+                    <div id="encoding-visual" class="encoding-visual" style="display: none;">
+                        <h5 class="font-semibold text-green-700 mb-2">Encoding Process</h5>
+                        <div id="encoding-steps"></div>
+                    </div>
+                    
+                    <div id="decoding-visual" class="decoding-visual" style="display: none;">
+                        <h5 class="font-semibold text-blue-700 mb-2">Decoding Process</h5>
+                        <div id="decoding-steps"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantum Circuit Visualization -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">Quantum Circuit Diagram</h3>
+                <div class="bg-gray-100 p-6 rounded-lg">
+                    <div class="circuit-container relative">
+                        <!-- Qubit lines -->
+                        <div class="flex flex-col space-y-8 mb-6">
+                            <div class="flex items-center">
+                                <div class="w-12 text-right pr-4 font-mono">Qubit A</div>
+                                <div class="flex-1 h-1 bg-purple-400 relative">
+                                    <div class="absolute left-1/4 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="circuit-gate bg-yellow-400 text-black p-2 rounded text-sm font-bold">H</div>
+                                    </div>
+                                    <div class="absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="circuit-gate bg-green-400 text-black p-2 rounded text-sm font-bold" id="gate-x">X</div>
+                                    </div>
+                                    <div class="absolute left-3/4 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="circuit-gate bg-blue-400 text-white p-2 rounded text-sm font-bold" id="gate-z">Z</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 text-right pr-4 font-mono">Qubit B</div>
+                                <div class="flex-1 h-1 bg-blue-400 relative">
+                                    <div class="absolute left-1/4 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Measurement -->
+                        <div class="flex items-center mt-8">
+                            <div class="w-12"></div>
+                            <div class="flex-1 flex justify-between">
+                                <div class="bg-gray-300 p-3 rounded text-center">
+                                    <div class="font-mono">Measurement</div>
+                                    <div class="text-sm">Bell Basis</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Decoding Visualization -->
+            <div id="decoding-details" class="bg-white rounded-lg shadow-lg p-6 mb-8" style="display: none;">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">📥 Decoding Process Details</h3>
+                
+                <div class="process-step">
+                    <div class="step-title">Step 1: Apply Inverse CNOT Gate:</div>
+                    <div class="state-transition">
+                        <span id="decoding-input-state" class="matrix">Φ⁺</span>
+                        <span class="arrow">→</span>
+                        <span class="gate-operation gate-cnot">CNOT†</span>
+                        <span class="arrow">→</span>
+                        <span id="after-cnot" class="matrix">(|00⟩+|10⟩)/√2</span>
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-title">Step 2: Apply Hadamard Gate:</div>
+                    <div class="state-transition">
+                        <span id="before-hadamard" class="matrix">(|00⟩+|10⟩)/√2</span>
+                        <span class="arrow">→</span>
+                        <span class="gate-operation gate-h">H⊗I</span>
+                        <span class="arrow">→</span>
+                        <span id="after-hadamard" class="matrix">|00⟩</span>
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-title">Step 3: Measurement and Bit Recovery:</div>
+                    <div class="state-transition">
+                        <span id="measurement-input" class="matrix">|00⟩</span>
+                        <span class="arrow">→</span>
+                        <span class="gate-operation" style="background: #666;">Measure</span>
+                        <span class="arrow">→</span>
+                        <span id="measurement-result" class="matrix">00</span>
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-title">Measurement Outcomes:</div>
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-purple-600 text-white">
+                                    <th class="p-2">Encoded State</th>
+                                    <th class="p-2">After CNOT†</th>
+                                    <th class="p-2">After H⊗I</th>
+                                    <th class="p-2">Measurement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">Φ⁺</td>
+                                    <td class="p-2">(|00⟩+|10⟩)/√2</td>
+                                    <td class="p-2">|00⟩</td>
+                                    <td class="p-2 font-mono">00</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">Ψ⁺</td>
+                                    <td class="p-2">(|01⟩+|11⟩)/√2</td>
+                                    <td class="p-2">|01⟩</td>
+                                    <td class="p-2 font-mono">01</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">Φ⁻</td>
+                                    <td class="p-2">(|00⟩-|10⟩)/√2</td>
+                                    <td class="p-2">|10⟩</td>
+                                    <td class="p-2 font-mono">10</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">Ψ⁻</td>
+                                    <td class="p-2">(|01⟩-|11⟩)/√2</td>
+                                    <td class="p-2">|11⟩</td>
+                                    <td class="p-2 font-mono">11</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step-by-Step Process -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">1</div>
+                    <h4 class="font-semibold text-purple-700 mb-2">Entanglement</h4>
+                    <p class="text-sm text-gray-600">Create Bell state Φ⁺</p>
+                    <div id="step1-status" class="mt-2 text-sm text-gray-500">Waiting...</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">2</div>
+                    <h4 class="font-semibold text-purple-700 mb-2">Encoding</h4>
+                    <p class="text-sm text-gray-600">Apply X/Z gates</p>
+                    <div id="step2-status" class="mt-2 text-sm text-gray-500">Waiting...</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">3</div>
+                    <h4 class="font-semibold text-purple-700 mb-2">Transmission</h4>
+                    <p class="text-sm text-gray-600">Send qubit A</p>
+                    <div id="step3-status" class="mt-2 text-sm text-gray-500">Waiting...</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">4</div>
+                    <h4 class="font-semibold text-purple-700 mb-2">Decoding</h4>
+                    <p class="text-sm text-gray-600">Bell measurement</p>
+                    <div id="step4-status" class="mt-2 text-sm text-gray-500">Waiting...</div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">Results</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 rounded-lg p-6">
+                        <h4 class="font-semibold text-green-700 mb-3">Original Bits</h4>
+                        <div id="original-bits" class="text-3xl font-mono bg-white p-4 rounded text-center">--</div>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-6">
+                        <h4 class="font-semibold text-blue-700 mb-3">Received Bits</h4>
+                        <div id="received-bits" class="text-3xl font-mono bg-white p-4 rounded text-center">--</div>
+                    </div>
+                </div>
+                <div id="result-status" class="mt-4 text-center text-lg font-semibold"></div>
+            </div>
+        </section>
+
+        <!-- Educational Explanation -->
+        <section class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">How Superdense Coding Works</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-purple-700 mb-4">Theoretical Foundation</h3>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        Superdense coding leverages quantum entanglement to achieve what's classically impossible: transmitting two bits using one quantum particle. The key is that entangled particles share correlations that exceed classical limits.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Entangled qubits exist in superposition</li>
+                        <li>Operations on one qubit affect the other instantly</li>
+                        <li>Bell measurement reveals the encoded information</li>
+                        <li>No-cloning theorem ensures security</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-semibold text-purple-700 mb-4">Gate Operations</h3>
+                    <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-purple-600 text-white">
+                                    <th class="p-2">Bits</th>
+                                    <th class="p-2">X Gate</th>
+                                    <th class="p-2">Z Gate</th>
+                                    <th class="p-2">Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">00</td>
+                                    <td class="p-2">No</td>
+                                    <td class="p-2">No</td>
+                                    <td class="p-2 font-mono">Φ⁺</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">01</td>
+                                    <td class="p-2">Yes</td>
+                                    <td class="p-2">No</td>
+                                    <td class="p-2 font-mono">Ψ⁺</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="p-2 font-mono">10</td>
+                                    <td class="p-2">No</td>
+                                    <td class="p-2">Yes</td>
+                                    <td class="p-2 font-mono">Φ⁻</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="p-2 font-mono">11</td>
+                                    <td class="p-2">Yes</td>
+                                    <td class="p-2">Yes</td>
+                                    <td class="p-2 font-mono">Ψ⁻</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>© 2024 Quantum Computing Education Demo. Educational simulation of superdense coding protocol.</p>
+            <p class="text-gray-400 mt-2">This is a classical simulation demonstrating quantum computing principles</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simulation state
+        let currentBits = null;
+        let simulationActive = false;
+
+        function startSimulation(bits) {
+            if (simulationActive) return;
+            
+            currentBits = bits;
+            simulationActive = true;
+            
+            // Update UI
+            document.getElementById('current-selection').textContent = bits;
+            document.getElementById('original-bits').textContent = bits;
+            document.getElementById('received-bits').textContent = '--';
+            document.getElementById('result-status').textContent = '';
+            
+            // Reset visualization
+            document.getElementById('qubit-a-state').textContent = '|0⟩';
+            document.getElementById('qubit-b-state').textContent = '|0⟩';
+            document.getElementById('encoding-visual').style.display = 'none';
+            document.getElementById('decoding-visual').style.display = 'none';
+            document.getElementById('encoding-details').style.display = 'none';
+            document.getElementById('decoding-details').style.display = 'none';
+            
+            // Reset steps
+            resetSteps();
+            
+            // Start simulation sequence
+            simulateStep1();
+        }
+
+        function resetSteps() {
+            const steps = ['step1-status', 'step2-status', 'step3-status', 'step4-status'];
+            steps.forEach(step => {
+                const element = document.getElementById(step);
+                element.textContent = 'Waiting...';
+                element.className = 'mt-2 text-sm text-gray-500';
+            });
+            
+            // Reset gates
+            document.getElementById('gate-x').className = 'circuit-gate bg-green-400 text-black p-2 rounded text-sm font-bold';
+            document.getElementById('gate-z').className = 'circuit-gate bg-blue-400 text-white p-2 rounded text-sm font-bold';
+        }
+
+        function simulateStep1() {
+            const step1 = document.getElementById('step1-status');
+            step1.textContent = 'Creating entanglement...';
+            step1.className = 'mt-2 text-sm text-yellow-600';
+            
+            // Show encoding details
+            document.getElementById('encoding-details').style.display = 'block';
+            
+            // Visual update
+            document.getElementById('qubit-a-state').textContent = '|+⟩';
+            document.getElementById('qubit-b-state').textContent = '|0⟩';
+            
+            setTimeout(() => {
+                document.getElementById('qubit-a-state').textContent = 'Φ⁺';
+                document.getElementById('qubit-b-state').textContent = 'Φ⁺';
+                step1.textContent = '✓ Bell state created';
+                step1.className = 'mt-2 text-sm text-green-600';
+                simulateStep2();
+            }, 1500);
+        }
+
+        function simulateStep2() {
+            const step2 = document.getElementById('step2-status');
+            step2.textContent = 'Encoding bits...';
+            step2.className = 'mt-2 text-sm text-yellow-600';
+            
+            // Show encoding visual
+            const encodingVisual = document.getElementById('encoding-visual');
+            const encodingSteps = document.getElementById('encoding-steps');
+            encodingVisual.style.display = 'block';
+            
+            // Update encoding details
+            let gateHTML = '';
+            let finalState = '';
+            
+            if (currentBits === '00') {
+                gateHTML = '<span class="gate-operation" style="background: #666;">I (Identity)</span>';
+                finalState = 'Φ⁺ = (|00⟩+|11⟩)/√2';
+                document.getElementById('qubit-a-state').textContent = 'Φ⁺';
+            } else if (currentBits === '01') {
+                gateHTML = '<span class="gate-operation gate-x">X Gate</span>';
+                finalState = 'Ψ⁺ = (|01⟩+|10⟩)/√2';
+                document.getElementById('qubit-a-state').textContent = 'Ψ⁺';
+            } else if (currentBits === '10') {
+                gateHTML = '<span class="gate-operation gate-z">Z Gate</span>';
+                finalState = 'Φ⁻ = (|00⟩-|11⟩)/√2';
+                document.getElementById('qubit-a-state').textContent = 'Φ⁻';
+            } else if (currentBits === '11') {
+                gateHTML = '<span class="gate-operation gate-x">X Gate</span> + <span class="gate-operation gate-z">Z Gate</span>';
+                finalState = 'Ψ⁻ = (|01⟩-|10⟩)/√2';
+                document.getElementById('qubit-a-state').textContent = 'Ψ⁻';
+            }
+            
+            document.getElementById('applied-gates').innerHTML = gateHTML;
+            document.getElementById('final-encoded-state').textContent = finalState;
+            encodingSteps.innerHTML = gateHTML;
+            
+            // Apply gates based on bits
+            const gateX = document.getElementById('gate-x');
+            const gateZ = document.getElementById('gate-z');
+            
+            setTimeout(() => {
+                if (currentBits === '01' || currentBits === '11') {
+                    gateX.className = 'circuit-gate bg-green-600 text-white p-2 rounded text-sm font-bold highlight';
+                }
+            }, 500);
+            
+            setTimeout(() => {
+                if (currentBits === '10' || currentBits === '11') {
+                    gateZ.className = 'circuit-gate bg-blue-600 text-white p-2 rounded text-sm font-bold highlight';
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                step2.textContent = '✓ Bits encoded';
+                step2.className = 'mt-2 text-sm text-green-600';
+                simulateStep3();
+            }, 1500);
+        }
+
+        function simulateStep3() {
+            const step3 = document.getElementById('step3-status');
+            step3.textContent = 'Transmitting qubit...';
+            step3.className = 'mt-2 text-sm text-yellow-600';
+            
+            // Visual effect for transmission
+            document.getElementById('qubit-a-state').style.opacity = '0.5';
+            
+            setTimeout(() => {
+                document.getElementById('qubit-a-state').style.opacity = '1';
+                step3.textContent = '✓ Qubit received';
+                step3.className = 'mt-2 text-sm text-green-600';
+                simulateStep4();
+            }, 1500);
+        }
+
+        function simulateStep4() {
+            const step4 = document.getElementById('step4-status');
+            step4.textContent = 'Measuring...';
+            step4.className = 'mt-2 text-sm text-yellow-600';
+            
+            // Show decoding details
+            document.getElementById('decoding-details').style.display = 'block';
+            
+            // Show decoding visual
+            const decodingVisual = document.getElementById('decoding-visual');
+            const decodingSteps = document.getElementById('decoding-steps');
+            decodingVisual.style.display = 'block';
+            
+            let decodingHTML = '<span class="gate-operation gate-h">H Gate</span> + <span class="gate-operation gate-cnot">CNOT Gate</span> → Measurement';
+            decodingSteps.innerHTML = decodingHTML;
+            
+            // Update decoding details based on current state
+            let inputState = '';
+            if (currentBits === '00') inputState = 'Φ⁺';
+            else if (currentBits === '01') inputState = 'Ψ⁺';
+            else if (currentBits === '10') inputState = 'Φ⁻';
+            else if (currentBits === '11') inputState = 'Ψ⁻';
+            
+            document.getElementById('decoding-input-state').textContent = inputState;
+            
+            setTimeout(() => {
+                // Update after CNOT
+                let afterCNOT = '';
+                if (currentBits === '00') afterCNOT = '(|00⟩+|10⟩)/√2';
+                else if (currentBits === '01') afterCNOT = '(|01⟩+|11⟩)/√2';
+                else if (currentBits === '10') afterCNOT = '(|00⟩-|10⟩)/√2';
+                else if (currentBits === '11') afterCNOT = '(|01⟩-|11⟩)/√2';
+                
+                document.getElementById('after-cnot').textContent = afterCNOT;
+                
+                setTimeout(() => {
+                    // Update after Hadamard
+                    let afterHadamard = '';
+                    if (currentBits === '00') afterHadamard = '|00⟩';
+                    else if (currentBits === '01') afterHadamard = '|01⟩';
+                    else if (currentBits === '10') afterHadamard = '|10⟩';
+                    else if (currentBits === '11') afterHadamard = '|11⟩';
+                    
+                    document.getElementById('after-hadamard').textContent = afterHadamard;
+                    document.getElementById('before-hadamard').textContent = afterCNOT;
+                    document.getElementById('measurement-input').textContent = afterHadamard;
+                    
+                    setTimeout(() => {
+                        // Visual update for measurement
+                        document.getElementById('qubit-a-state').textContent = 'M';
+                        document.getElementById('qubit-b-state').textContent = 'M';
+                        
+                        setTimeout(() => {
+                            // Simulate measurement result
+                            document.getElementById('received-bits').textContent = currentBits;
+                            document.getElementById('measurement-result').textContent = currentBits;
+                            step4.textContent = '✓ Measurement complete';
+                            step4.className = 'mt-2 text-sm text-green-600';
+                            
+                            // Show success message
+                            document.getElementById('result-status').textContent = '✓ Success! 2 bits transmitted using 1 qubit';
+                            document.getElementById('result-status').className = 'mt-4 text-center text-lg font-semibold text-green-600';
+                            
+                            // Final visual state
+                            document.getElementById('qubit-a-state').textContent = currentBits.charAt(0);
+                            document.getElementById('qubit-b-state').textContent = currentBits.charAt(1);
+                            
+                            simulationActive = false;
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        // Initialize demo with example
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start with 00 as example after a short delay
+            setTimeout(() => {
+                startSimulation('00');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
